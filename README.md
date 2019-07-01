@@ -114,3 +114,7 @@ oc get route
 #### Reference
 
 https://github.com/NexClipper/NexClipper
+
+#### Live Demo
+
+https://demo.nexclipper.io/
