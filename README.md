@@ -4,11 +4,11 @@ NexClipper is the container and container orchestration monitoring and performan
 
 ## Architecture Overview
 
-![](docs/images/NexClipper_Architecture.png)
+![](image/NexClipper_Architecture.png)
 
 ## NexClipper Dashboard
 
-![](docs/images/NexClipper_dashboard.png)
+![](image/NexClipper_dashboard.png)
 
 ## Quick Install
 
