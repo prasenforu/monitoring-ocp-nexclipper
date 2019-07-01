@@ -55,7 +55,7 @@ oc cp mysql/load.sql <mysql pod>:/tmp/
   > source load.sql
 ```
 
-#### Step #3 Setup Influxdb
+#### Step #4 Setup Influxdb
 
 ```
 oc create -f influx/mysql-pvc.yaml
@@ -63,49 +63,35 @@ oc create -f influx/deployment.yaml
 oc create -f influx/service.yaml
 ```
 
-> #### rabbitmq (or kafka)
+#### Step #5 Setup Rabbitmq
 
-- create
-```sh
-  $ kubectl create -f <yaml/rabbitmq/deployment.yaml>
-  $ kubectl create -f <yaml/rabbitmq/service.yaml>
+```
+oc create -f rabbitmq/deployment.yaml
+oc create -f rabbitmq/service.yaml
 ```
 
-- [If you want to use Kafka instead of RabbitMQ, Go to](https://github.com/NexClipper/NexClipper/blob/dev/docs/option/kafka.md)
-
-
-### NexClipper service deployment
+#### Step #5 NexClipper service deployment
 
 > #### workflow
 
-- create
-```sh
-  $ kubectl create -f <yaml/workflow/deployment.yaml>
 ```
-
-- [If you don't use 'defaultdb' for MySQL or use kafka, Go to](https://github.com/NexClipper/NexClipper/blob/dev/docs/option/workflow.md)
+oc create -f workflow/deployment.yaml
+```
 
 > #### collector
 
-- create
-```sh
-  $ kubectl create -f <yaml/collector/deployment.yaml>
-  $ kubectl create -f <yaml/collector/service.yaml>
 ```
-
-- [If you don't use 'defaultdb' for MySQL or use kafka, Go to](https://github.com/NexClipper/NexClipper/blob/dev/docs/option/collector.md)
-
+oc create -f collector/deployment.yaml
+oc create -f collector/service.yaml
+```
 
 > #### nexservice
 
-- create
-```sh
-  $ kubectl create -f <yaml/nexservice/deployment.yaml>
-  $ kubectl create -f <yaml/nexservice/service.yaml>
 ```
-
-- [If you want to use your own database insted of 'detaultdb', Go to](https://github.com/NexClipper/NexClipper/blob/dev/docs/option/nexservice.md)
-
+oc create -f nexservice/deployment.yaml
+oc create -f nexservice/service.yaml
+oc expose service/nexclipper-service
+```
 
 ### NexClipper Agent daemonset/deployment
 
@@ -113,35 +99,14 @@ oc create -f influx/service.yaml
   - agent deployed by daemonset: get host and docker container's information
   - agent deployed by deployment: get Kubernetes cluster's information
 
-- create
-```sh
-  $ kubectl create -f <yaml/nexclipper-agent/nexclipper-agent.yaml>
+Agent normally deployed different project/namespace ```nexclipperagent```
+
+```
+oc create -f nexclipper-agent/nexclipper-agent.yaml
 ```
 
 
-### Now you can access web UI
+### Now you can access NexClipper web UI
 ```
-  https://<k8s master ip>:32200
+oc get route
 ```
-
-### For API Swasgger UI
-```
-  https://<k8s master ip>:32200/swagger-ui.html 
-```
-
-## Licensing
-
-NexClipper is licensed under the Apache License, Version 2.0. See [LICENSE](https://github.com/NexClipper/NexClipper/blob/master/LICENSE) for the full license text.
-
-## Contact
-
-Email: nexclipper@nexclipper.io
-
-Homepage: https://www.nexclipper.io/
-
-Facebook : https://www.facebook.com/nexclipper/
-
-Linkedin: https://www.linkedin.com/company/nexcloud/
-
-Twitter: https://twitter.com/NexClipper
-
