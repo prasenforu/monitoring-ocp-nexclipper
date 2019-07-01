@@ -1,47 +1,6 @@
-# NexClipper
+# Monitoring Openshift/Kubernetes with NexClipper
 
-NexClipper is the container and container orchestration monitoring and performance management solution specialized in Docker, DC/OS, Mesosphere, Kubernetes. NexClipper Cloud especially supports machine learning based predictive, forecasting, anomaly detection.
-
-There are two different versions of NexClipper: NexClipper Cloud and NexClipper.
-
-Please note that previous  NexClipper Light project which was host level container monitoring tool was moved to [NexLight](https://github.com/NexClipper/NexClipper/tree/master/NexLight) directory.
-
-![](docs/images/logo1_wide.png)
-
-NexClipper is a silver member of [Cloud Native Computing Foundation (CNCF)](https://landscape.cncf.io/category=monitoring&format=card-mode&grouping=category).
-
-![](docs/images/cncf.png)
-
-## NexClipper Cloud (SaaS)
-
-NexClipper Cloud is an online SaaS to monitor and manage performance of the container cluster -  Docker, DC/OS and Kubernetes.
-NexClipper Cloud features the following capabilities:
-- Fullstack dashboard (Infrastructure, DC/OS, Kubernetes)
-- Container Cluster (DC/OS, Kubernetes)
-- Service Performance (for API)
-- Infrastructure  Monitoring (Container, Host, Resource)
-- Incidents Management
-- AI Analytics (Forecasting, Anomaly detection, Metric correlation)
-
-For more details visit  https://www.nexclipper.io/
-For beta service, visit https://server.nexclipper.com
-
-## NexClipper (On-Premise)
-
-NexClipper is an open source software to monitor and manage performance of the container cluster -  Docker and Kubernetes.
-NexClipper features the following capabilities:
-- Fullstack dashboard (Kubernetes and Infrastructure)
-- Container Cluster (Kubernetes cluster, nodes and workloads)
-- Infrastructure Monitoring (Docker Container, Host, Resource)
-- Incidents Management (Rule set and alert manager) (#30)
-- Rest API service (Soon)
-- Global view for multi cluster (Soon)
-- Dashboard Enhancement to replace k8s dashboard (Soon)
-- Dashboard Enhancement for customizing (Plan)
-- Prometheus Integration (Plan)
-- Workload management and deployment (Plan)
-- Multi tenancy (Plan)
-- Resource analytics and forecasting (Plan)
+NexClipper is the container and container orchestration monitoring and performance management solution specialized in Docker, Openshift, Kubernetes. NexClipper Cloud especially supports machine learning based predictive, forecasting, anomaly detection.
 
 ## Architecture Overview
 
@@ -53,78 +12,55 @@ NexClipper features the following capabilities:
 
 ## Quick Install
 
-NexClipper can be deployed on Kubernetes cluster. 
+NexClipper can be deployed on Openshift/Kubernetes cluster. 
 
 ### Prerequisites
 
-- Installed Kubernetes Cluster (Master Node, Worker Node 1 more)
-- An SSH key pair on your local Linux/macOS/BSD machine.
-- ***Create namespace `nexclipper'***
-- ***Download yaml files from 'yaml' directory  ***
-
-### HELM chart Deployment
-
-- [If you want to use HELM chart to install, Go to](https://github.com/NexClipper/NexClipper/tree/dev/HELM/README.md)
-
+- Installed Openshift/Kubernetes Cluster 
 
 ### Prepare deployment
 
-From your master node run kubectl create. 
+#### Step #1 Create project/namespace and do proper patching
 
-> #### redis
+```
+oc new-project nexclipperagent
+oc new-project nexclipper
 
-- create
-```sh
-  $ kubectl create -f <yaml/redis/deployment.yaml>
-  $ kubectl create -f <yaml/redis/service.yaml>
+oc patch namespace nexclipper -p '{"metadata":{"annotations":{"openshift.io/node-selector":"region=infra"}}}'
+oc patch namespace nexclipperagent -p '{"metadata":{"annotations":{"openshift.io/node-selector":""}}}'
 ```
 
-> #### mysql(or mariaDB)
+#### Step #2 Setup Redis
 
-- Update hostpath for volume
-```yaml
-// yaml/mysql/deployment.yaml
-...
-volumes:
-  - name: mysql-data
-    hostPath:
-      path: /nfs/mysql        # update hostpath
-...
+```
+oc project nexclipper
+oc create -f redis/deployment.yaml
+oc create -f redis/service.yaml
 ```
 
-- create
-```sh
-  $ kubectl create -f <yaml/mysql/deployment.yaml>
-  $ kubectl create -f <yaml/mysql/service.yaml>
+#### Step #3 Setup Mysql
+
+```
+oc create -f mysql/mysql-pvc.yaml
+oc create -f mysql/deployment.yaml
+oc create -f mysql/service.yaml
 ```
 
 - Create Mysql table and data
-```sh
-  $ kubectl exec -it <mysql pod id> -n nexclipper sh
+```
+oc cp mysql/load.sql <mysql pod>:/tmp/
+  oc rsh <mysql pod> 
   > mysql -uadmin -ppassword
   > use defaultdb
-  > (Execute stript of load.sql at https://github.com/NexClipper/NexClipper/blob/master/yaml/mysql/load.sql) 
+  > source load.sql
 ```
 
-- [If you want to use your own database instead of 'detaultdb', Go to](https://github.com/NexClipper/NexClipper/blob/dev/docs/option/mysql.md)
+#### Step #3 Setup Influxdb
 
-> #### influxdb
-
-- Update hostpath for volume
-```yaml
-// yaml/influx/deployment.yaml
-...
-volumes:
-  - name: influx-data
-    hostPath:
-      path: /nfs/influxdb        # update hostpath
-...
 ```
-
-- create
-```sh
-  $ kubectl create -f <yaml/influxdb/deployment.yaml>
-  $ kubectl create -f <yaml/influxdb/service.yaml>
+oc create -f influx/mysql-pvc.yaml
+oc create -f influx/deployment.yaml
+oc create -f influx/service.yaml
 ```
 
 > #### rabbitmq (or kafka)
