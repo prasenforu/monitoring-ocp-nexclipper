@@ -7,7 +7,6 @@ metadata:
     version: v0.1
   namespace: nexclipper
 spec:
-  type: NodePort
   ports:
   - port: 10100
     protocol: TCP
