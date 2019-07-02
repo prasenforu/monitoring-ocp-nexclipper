@@ -52,7 +52,7 @@ oc cp mysql/load.sql <mysql pod>:/tmp/
   oc rsh <mysql pod> 
   > mysql -uadmin -ppassword
   > use defaultdb
-  > source load.sql
+  > source /tmp/load.sql
 ```
 
 #### Step #4 Setup Influxdb
@@ -72,20 +72,20 @@ oc create -f rabbitmq/service.yaml
 
 #### Step #5 NexClipper service deployment
 
-> #### workflow
+> #### Workflow
 
 ```
 oc create -f workflow/deployment.yaml
 ```
 
-> #### collector
+> #### Collector
 
 ```
 oc create -f collector/deployment.yaml
 oc create -f collector/service.yaml
 ```
 
-> #### nexservice
+> #### Nexservice
 
 ```
 oc create -f nexservice/deployment.yaml
